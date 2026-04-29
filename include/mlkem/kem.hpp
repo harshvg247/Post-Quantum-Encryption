@@ -10,14 +10,14 @@
 namespace mlkem
 {
 
-    // CPA security protects against attackers who can obtain encryptions 
-    // of chosen messages, while 
-    // CCA security additionally protects against attackers 
-    // who can request decryptions of chosen ciphertexts. 
-    // CCA is strictly stronger and necessary in practical systems, 
-    // as it defends against adaptive attacks where adversaries manipulate ciphertexts. 
-    // ML-KEM achieves CCA security using the Fujisaki–Okamoto transform, 
-    // which verifies ciphertext integrity via re-encryption 
+    // CPA security protects against attackers who can obtain encryptions
+    // of chosen messages, while
+    // CCA security additionally protects against attackers
+    // who can request decryptions of chosen ciphertexts.
+    // CCA is strictly stronger and necessary in practical systems,
+    // as it defends against adaptive attacks where adversaries manipulate ciphertexts.
+    // ML-KEM achieves CCA security using the Fujisaki–Okamoto transform,
+    // which verifies ciphertext integrity via re-encryption
     // and uses fallback randomness to prevent information leakage.
 
     class KEM
@@ -156,22 +156,28 @@ namespace mlkem
         static bool ciphertext_equal(const KPKE::Ciphertext &a,
                                      const KPKE::Ciphertext &b)
         {
+            uint16_t diff = 0;
+
+            // Compare vector u
             for (std::size_t i = 0; i < KPKE::K; ++i)
             {
                 for (std::size_t j = 0; j < MLKEM_N; ++j)
                 {
-                    if (a.u[i][j] != b.u[i][j])
-                        return false;
+                    // Bitwise OR accumulates any non-zero difference
+                    diff |= (a.u[i][j] ^ b.u[i][j]);
                 }
             }
 
+            // Compare polynomial v
             for (std::size_t i = 0; i < MLKEM_N; ++i)
             {
-                if (a.v[i] != b.v[i])
-                    return false;
+                diff |= (a.v[i] ^ b.v[i]);
             }
 
-            return true;
+            // If diff is 0, they are equal.
+            // We return a boolean while avoiding an explicit 'if' if possible,
+            // though the final conversion to bool is generally safe at the end.
+            return (diff == 0);
         }
 
         static void decaps(const SecretKey &sk,
