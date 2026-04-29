@@ -10,3 +10,12 @@ Why use noexcept?
         introduce timing side channels
         make control flow harder to audit
         reduce performance predictability
+
+On running examples/naive_vs_ntt.cpp following results were obtained:
+// Running benchmark (100 iterations)...
+
+Results:
+Naive: 0.130817 sec
+NTT  : 0.0088718 sec
+
+Speedup: 14.7452x
